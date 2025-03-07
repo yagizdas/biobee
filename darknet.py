@@ -122,6 +122,7 @@ def load_network(config_file, data_file, weights, batch_size=1):
     """
     network = load_net_custom(
         config_file.encode("ascii"),
+        data_file.encode("ascii"),
         weights.encode("ascii"), 0, batch_size)
     return network
 
