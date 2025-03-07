@@ -145,7 +145,7 @@ def print_detections(detections, coordinates=False):
             print("{}: {}%    (left_x: {:.0f}   top_y:  {:.0f}   width:   {:.0f}   height:  {:.0f})".format(label, confidence, x, y, w, h))
         else:
             print("{}: {}%".format(label, confidence))
-        detected_objects.append(label,confidence)
+        detected_objects.append([label,confidence])
     return detected_objects
 
 # Function to draw bounding boxes on an image
