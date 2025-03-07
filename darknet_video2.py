@@ -16,7 +16,7 @@ from picamera2 import Picamera2
 from collections import defaultdict
 
 #5 class icin 
-items_dict = defaultdict()
+items_dict = defaultdict(list)
 
 # Initialize Picamera2
 picam2 = Picamera2()
@@ -197,7 +197,7 @@ def inference(darknet_image_queue, detections_queue, fps_queue):
 
         # x labellanmışa ne kadar emin oldugunu ekle
         for x,confidence in labels:
-            items_dict[x] += confidence
+            items_dict[x].append(confidence)
         
         print(max(items_dict, key=items_dict.get))
         darknet.free_image(darknet_image)  # Free the memory of the Darknet image
