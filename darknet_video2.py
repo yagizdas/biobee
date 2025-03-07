@@ -14,9 +14,14 @@ import sys
 
 from picamera2 import Picamera2
 
+
 # Initialize Picamera2
 picam2 = Picamera2()
-config = picam2.create_preview_configuration(main={"size": (640, 480), "format": "RGB888"})
+
+#config (orijinal kodun yapısında opencv ile BGR'dan RBG'ye dönüşüm yapılıyor. Resmi BGR formatında alırsak implmenetasyon daha düzgün olabilir)
+config = picam2.create_preview_configuration(main={"size": (640, 480), "format": "BGR888"})
+
+
 picam2.configure(config)
 picam2.start()
 
@@ -27,22 +32,23 @@ inference_thread = None
 drawing_thread = None
 frame_delay = 30  # Delay in milliseconds (default is 30 for normal speed)
 
-# Get video dimensions from Picamera2 configuration
+# config kullanılarak video input sizeları alınıyor [genislik,height] formatında
 video_width = config["main"]["size"][0]
 video_height = config["main"]["size"][1]
 
 
+#calistirma argumanları 
 def parse_args():
     parser = argparse.ArgumentParser(description="YOLO Object Detection")
     parser.add_argument("--out_filename", type=str, default="",
                         help="inference video name. Not saved if empty")
-    parser.add_argument("--weights", default="yolov4.weights",
+    parser.add_argument("--weights", default="yolov4-tiny.weights",
                         help="yolo weights path")
     parser.add_argument("--dont_show", action='store_true',
                         help="window inference display. For headless systems")
     parser.add_argument("--ext_output", action='store_true',
                         help="display bbox coordinates of detected objects")
-    parser.add_argument("--config_file", default="yolov4.cfg",
+    parser.add_argument("--config_file", default="yolov4-tiny.cfg",
                         help="path to config file")
     parser.add_argument("--data_file", default="coco.data",
                         help="path to data file")
@@ -51,8 +57,7 @@ def parse_args():
     parser.add_argument("--gpu_index", type=int, default=0,
                         help="GPU index to use for processing")
     return parser.parse_args()
-
-
+#ve assertionları
 def check_arguments_errors(args):
     assert 0 < args.thresh < 1, "Threshold should be a float between zero and one (non-inclusive)"
     if not os.path.exists(args.config_file):
@@ -61,6 +66,8 @@ def check_arguments_errors(args):
         raise(ValueError("Invalid weight path {}".format(os.path.abspath(args.weights))))
     if not os.path.exists(args.data_file):
         raise(ValueError("Invalid data file path {}".format(os.path.abspath(args.data_file))))
+
+
 
 
 def set_saved_video(output_video, size):
@@ -129,9 +136,11 @@ def video_capture(frame_queue, darknet_image_queue):
     global is_running, frame_delay
     
     while is_running:
-        # Capture frame from picamera2
+        # Capture array görüntünün cv2 integrasyonunda kullanılıyor gibi görünüyor
+        # picamera2 official reposundaki örnek kod: https://github.com/raspberrypi/picamera2/blob/main/examples/opencv_face_detect.py
         frame = picam2.capture_array()
         
+        """
         # Handle key presses for speed control
         key = cv2.waitKey(frame_delay) & 0xFF
         if key == ord('q'):
@@ -139,10 +148,9 @@ def video_capture(frame_queue, darknet_image_queue):
         elif key == 82:  # Arrow Up Key
             frame_delay = max(1, frame_delay - 5)  # Decrease delay, speed up
         elif key == 84:  # Arrow Down Key
-            frame_delay += 5  # Increase delay, slow down
+            frame_delay += 5  # Increase delay, slow down """
         
-        # Convert the frame from RGB (picamera2 format) to BGR (OpenCV format)
-        # Note: picamera2 with RGB888 format already gives us RGB format
+        #Frame'i BGR'dan RBG'ye donusturme
         frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         
         # Resize the frame to the dimensions expected by Darknet
@@ -180,7 +188,7 @@ def inference(darknet_image_queue, detections_queue, fps_queue):
         fps_queue.put(fps)  # Put the FPS value in the fps queue
         print("FPS: {}".format(fps))  # Print the FPS
         
-        # Print detections if extended output is enabled
+        # burası değiştirilecek yüksek ihtimal
         darknet.print_detections(detections, args.ext_output)
         
         darknet.free_image(darknet_image)  # Free the memory of the Darknet image
@@ -237,13 +245,14 @@ def drawing(frame_queue, detections_queue, fps_queue):
 
 
 if __name__ == '__main__':
-    # Register the signal handler for graceful shutdown
+
+    # ne bilmiyorum
     signal.signal(signal.SIGINT, signal_handler)
     
-    # Parse command-line arguments
+    # açarkenki parametreleri parselıyor
     args = parse_args()
     
-    # Set GPU and perform argument checks
+    # GPU olmayacak bu koda gerek yok aslında
     darknet.set_gpu(args.gpu_index)
     check_arguments_errors(args)
     
