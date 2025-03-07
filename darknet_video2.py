@@ -13,9 +13,10 @@ import signal
 import sys
 import csv
 from picamera2 import Picamera2
+from collections import defaultdict
 
 #5 class icin 
-items_dict = {0:0, 1:0, 2:0, 3:0, 4:0}
+items_dict = defaultdict()
 
 # Initialize Picamera2
 picam2 = Picamera2()
