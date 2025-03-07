@@ -137,6 +137,7 @@ def print_detections(detections, coordinates=False):
     Prints:
         Detected objects with or without bounding box coordinates.
     """
+    detected_objects = []
     print("\nObjects:")
     for label, confidence, bbox in detections:
         x, y, w, h = bbox
@@ -144,6 +145,8 @@ def print_detections(detections, coordinates=False):
             print("{}: {}%    (left_x: {:.0f}   top_y:  {:.0f}   width:   {:.0f}   height:  {:.0f})".format(label, confidence, x, y, w, h))
         else:
             print("{}: {}%".format(label, confidence))
+        detected_objects.append(label,confidence)
+    return detected_objects
 
 # Function to draw bounding boxes on an image
 def draw_boxes(detections, image, colors):

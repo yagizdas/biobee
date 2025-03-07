@@ -11,9 +11,11 @@ from threading import Thread, enumerate
 from queue import Queue
 import signal
 import sys
-
+import csv
 from picamera2 import Picamera2
 
+#5 class icin 
+items_dict = {0:0, 1:0, 2:0, 3:0, 4:0}
 
 # Initialize Picamera2
 picam2 = Picamera2()
@@ -138,6 +140,7 @@ def video_capture(frame_queue, darknet_image_queue):
     while is_running:
         # Capture array görüntünün cv2 integrasyonunda kullanılıyor gibi görünüyor
         # picamera2 official reposundaki örnek kod: https://github.com/raspberrypi/picamera2/blob/main/examples/opencv_face_detect.py
+
         frame = picam2.capture_array()
         
         """
@@ -188,9 +191,14 @@ def inference(darknet_image_queue, detections_queue, fps_queue):
         fps_queue.put(fps)  # Put the FPS value in the fps queue
         print("FPS: {}".format(fps))  # Print the FPS
         
-        # burası değiştirilecek yüksek ihtimal
-        darknet.print_detections(detections, args.ext_output)
+        # labels formatı : [label,confidence] oldu
+        labels = darknet.print_detections(detections, args.ext_output)
+
+        # x labellanmışa ne kadar emin oldugunu ekle
+        for x,confidence in labels:
+            items_dict[x] += confidence
         
+        print(max(items_dict, key=items_dict.get))
         darknet.free_image(darknet_image)  # Free the memory of the Darknet image
 
 
@@ -254,6 +262,7 @@ if __name__ == '__main__':
     
     # GPU olmayacak bu koda gerek yok aslında
     darknet.set_gpu(args.gpu_index)
+
     check_arguments_errors(args)
     
     # Load YOLO network
