@@ -123,21 +123,7 @@ def load_network(config_file, data_file, weights, batch_size=1):
     network = load_net_custom(
         config_file.encode("ascii"),
         weights.encode("ascii"), 0, batch_size)
-    
-    # Load class names from data file
-    with open(data_file, 'r') as f:
-        for line in f.readlines():
-            if 'names' in line:
-                names_file = line.strip().split('=')[1].strip()
-                break
-    
-    with open(names_file, 'r') as f:
-        class_names = [line.strip() for line in f.readlines()]
-    
-    # Generate colors for each class
-    class_colors = class_colors(class_names)
-    
-    return network, class_names, class_colors
+    return network
 
 # Function to print detected objects and their confidence scores
 def print_detections(detections, coordinates=False):

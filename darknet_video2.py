@@ -266,10 +266,18 @@ if __name__ == '__main__':
     check_arguments_errors(args)
     
     # Load YOLO network
-    network, class_names, class_colors = darknet.load_network(
+    network = darknet.load_network(
         args.config_file, args.data_file, args.weights, batch_size=1
     )
     
+        # Load class names from data file
+
+    with open(args.data_file, 'r') as f:
+        class_names = [line.strip() for line in f.readlines()]
+
+    # Generate colors for each class
+    class_colors = darknet.class_colors(class_names)
+
     # Get network dimensions
     darknet_width = darknet.network_width(network)
     darknet_height = darknet.network_height(network)
