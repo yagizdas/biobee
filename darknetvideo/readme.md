@@ -3,8 +3,7 @@
 ## Video/Webcam/Display Commands
 
 ### !!! Main Command to Run !!!
-python darknet_video2.py --weights weights_file_path --config_file 
-config_file_path --data_file name_file_path 
+    python darknet_video2.py --weights weights_file_path --config_file config_file_path --data_file name_file_path 
 
 ## Additional Information from original repo (can be ignored)
 
