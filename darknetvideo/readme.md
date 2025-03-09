@@ -1,6 +1,12 @@
-# Darknet/YOLO Command Guide for Python
+# Darknet/YOLO for Python - Custom PiCamera2 Support
 
 ## Video/Webcam/Display Commands
+
+### !!! Main Command to Run !!!
+python darknet_video2.py --weights weights_file_path --config_file 
+config_file_path --data_file name_file_path 
+
+## Additional Information from original repo (can be ignored)
 
 ### Process a Video File
     python darknet_video.py --input 2.mp4 --weights yolov4.weights --config_file yolov4.cfg --data_file obj.data
@@ -30,11 +36,6 @@
 
 ### Display Extended Output
     --ext_output
-
-### Controls
-- Right-click in console to stop video
-- Left-click in console to resume
-- Press 'q' key to stop video
 
 ## Image Detection Commands
 
